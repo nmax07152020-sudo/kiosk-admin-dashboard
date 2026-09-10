@@ -1,0 +1,11 @@
+create extension if not exists pgcrypto;
+create table if not exists public.kiosks(id uuid primary key default gen_random_uuid(),kiosk_id text unique not null,name text not null,device_model text,android_version text,status text not null default 'active',last_seen_at timestamptz,registration_token_hash text,notes text,created_at timestamptz not null default now(),updated_at timestamptz not null default now());
+create table if not exists public.access_codes(id uuid primary key default gen_random_uuid(),code text unique not null,minutes integer not null check(minutes>0),kiosk_id text,status text not null default 'unused' check(status in('unused','used','revoked')),one_time boolean not null default true,expires_at timestamptz,used_at timestamptz,used_by_kiosk_id text,revoked_at timestamptz,created_by uuid references auth.users(id) on delete set null,created_at timestamptz not null default now());
+create table if not exists public.sessions(id uuid primary key default gen_random_uuid(),kiosk_id text not null,code text,minutes integer not null default 0,started_at timestamptz not null default now(),ended_at timestamptz,status text not null default 'active' check(status in('active','completed','cancelled')),created_at timestamptz not null default now());
+create table if not exists public.app_settings(id integer primary key default 1,default_minutes integer not null default 60,offline_threshold integer not null default 5,code_prefix text not null default 'KSK',updated_at timestamptz not null default now());
+insert into public.app_settings(id) values(1) on conflict(id) do nothing;
+alter table public.kiosks enable row level security; alter table public.access_codes enable row level security; alter table public.sessions enable row level security; alter table public.app_settings enable row level security;
+create policy "auth kiosks all" on public.kiosks for all to authenticated using(true) with check(true);
+create policy "auth codes all" on public.access_codes for all to authenticated using(true) with check(true);
+create policy "auth sessions all" on public.sessions for all to authenticated using(true) with check(true);
+create policy "auth settings all" on public.app_settings for all to authenticated using(true) with check(true);
