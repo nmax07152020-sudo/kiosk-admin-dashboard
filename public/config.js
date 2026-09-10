@@ -1,1 +1,4 @@
-window.KIOSK_CONFIG={SUPABASE_URL:"https://YOUR_PROJECT.supabase.co",SUPABASE_ANON_KEY:"YOUR_SUPABASE_ANON_KEY"};
+window.KIOSK_CONFIG = {
+  SUPABASE_URL: "https://zfxbuvktmtrcauqvgzod.supabase.co",
+  SUPABASE_ANON_KEY: "ILAGAY_DITO_ANG_PUBLISHABLE_KEY"
+};
